@@ -653,7 +653,6 @@ function updateClock() {
   }
 
   document.getElementById('st-date').textContent = now.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-}
 <script>
 async function fetchLivePrice(symbol) {
   const url = `https://api.twelvedata.com/price?symbol=${encodeURIComponent(symbol)}&apikey=${TWELVEDATA_API_KEY}`;
