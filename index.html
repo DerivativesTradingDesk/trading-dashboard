@@ -28,9 +28,7 @@
   --font-body: 'DM Sans', sans-serif;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
-
 body {
   font-family: var(--font-body);
   background: var(--bg);
@@ -39,8 +37,6 @@ body {
   font-size: 14px;
   overflow-x: hidden;
 }
-
-/* scanline overlay */
 body::before {
   content: '';
   position: fixed; inset: 0;
@@ -48,8 +44,6 @@ body::before {
   pointer-events: none;
   z-index: 9999;
 }
-
-/* HEADER */
 header {
   background: var(--bg2);
   border-bottom: 1px solid var(--border2);
@@ -94,7 +88,6 @@ header {
 .status-open  { color: var(--green); border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.06); }
 .status-closed{ color: var(--red);   border-color: rgba(255,68,85,0.3);  background: rgba(255,68,85,0.06); }
 
-/* TOOLBAR */
 .toolbar {
   background: var(--bg3);
   border-bottom: 1px solid var(--border);
@@ -160,7 +153,6 @@ header {
 .btn-green { color: var(--green); border-color: rgba(0,255,136,0.4);   background: rgba(0,255,136,0.06);  }
 .action-btn:hover { opacity: 0.8; transform: translateY(-1px); }
 
-/* STATS BAR */
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -179,7 +171,6 @@ header {
 .stat-val.g { color: var(--green); }
 .stat-val.a { color: var(--amber); }
 
-/* MAIN GRID */
 .main { padding: 1.5rem; }
 
 .grid-header {
@@ -270,9 +261,7 @@ header {
   color: var(--muted);
   text-align: right;
 }
-.cell-rating {
-  text-align: center;
-}
+.cell-rating { text-align: center; }
 .rating-badge {
   display: inline-block;
   font-family: var(--font-mono);
@@ -310,7 +299,6 @@ header {
   color: var(--amber);
 }
 
-/* NOTES PANEL */
 .notes-wrap {
   margin-top: 1.5rem;
   display: grid;
@@ -352,7 +340,6 @@ header {
 .notes-card li strong { color: var(--amber); }
 .note-risk { color: var(--red) !important; }
 
-/* SECTOR LEGEND */
 .legend {
   margin-top: 1rem;
   background: var(--bg2);
@@ -373,7 +360,6 @@ header {
   gap: 8px;
 }
 
-/* FOOTER */
 footer {
   text-align: center;
   padding: 1.5rem;
@@ -386,7 +372,6 @@ footer {
 }
 footer a { color: var(--cyan-dim); text-decoration: none; }
 
-/* DIVIDER LABELS */
 .group-label {
   font-family: var(--font-head);
   font-size: 1rem;
@@ -398,7 +383,6 @@ footer a { color: var(--cyan-dim); text-decoration: none; }
   margin-bottom: 4px;
 }
 
-/* HIDDEN */
 .hidden { display: none !important; }
 </style>
 </head>
@@ -443,7 +427,6 @@ footer a { color: var(--cyan-dim); text-decoration: none; }
 </div>
 
 <div class="main">
-
   <div class="grid-header">
     <div>TICKER</div>
     <div>NAME / SECTOR</div>
@@ -508,7 +491,6 @@ footer a { color: var(--cyan-dim); text-decoration: none; }
       <span class="sector-tag tag-specul">Speculative</span>
     </div>
   </div>
-
 </div>
 
 <footer>
@@ -518,35 +500,40 @@ footer a { color: var(--cyan-dim); text-decoration: none; }
 </footer>
 
 <script>
-// ─── TICKER DATA ────────────────────────────────────────────────────────
+const TWELVEDATA_API_KEY = "
+528388fd472444618660d5286cd89e04
+
+
+
+";
+
 const tickers = [
-  // Ticker, Full Name, Sector, SectorTag, Price(approx), 52wLow, 52wHigh, DivYield, MktCap, AnalystRating, STBGrade(est)
-  { t:"ABEV", n:"Ambev SA ADR",                   s:"finance",  tag:"tag-brewery", price:2.38,  lo:1.73, hi:2.58, div:"13.0%", cap:"$36B", analyst:"Hold",       stb:"C+" },
-  { t:"AG",   n:"First Majestic Silver",           s:"silver",   tag:"tag-silver",  price:10.80, lo:5.19, hi:32.04,div:"0.4%",  cap:"$2.1B",analyst:"Buy",        stb:"B"  },
-  { t:"ASTI", n:"Ascendant Digital Acquisition",   s:"specul",   tag:"tag-specul",  price:0.18,  lo:0.08, hi:1.10, div:"—",     cap:"<$50M",analyst:"N/R",        stb:"N/R"},
-  { t:"ATAI", n:"ATAI Life Sciences",              s:"specul",   tag:"tag-specul",  price:1.20,  lo:0.80, hi:3.50, div:"—",     cap:"~$200M",analyst:"N/R",       stb:"N/R"},
-  { t:"BBD",  n:"Banco Bradesco ADR",              s:"finance",  tag:"tag-finance", price:2.50,  lo:1.90, hi:3.20, div:"7.2%",  cap:"$25B", analyst:"Buy",        stb:"C+" },
-  { t:"BTG",  n:"B2Gold Corp",                     s:"gold",     tag:"tag-gold",    price:4.80,  lo:3.10, hi:6.90, div:"5.0%",  cap:"$4.8B",analyst:"Buy",        stb:"B"  },
-  { t:"CDE",  n:"Coeur Mining",                    s:"silver",   tag:"tag-silver",  price:7.60,  lo:4.20, hi:11.80,div:"0.0%",  cap:"$2.8B",analyst:"Buy",        stb:"B-" },
-  { t:"CIG",  n:"CEMIG — Brazil Utility ADR",      s:"energy",   tag:"tag-util",    price:2.20,  lo:1.60, hi:3.00, div:"8.5%",  cap:"$5.5B",analyst:"Hold",       stb:"C"  },
-  { t:"ELP",  n:"Copel — Brazil Energy ADR",       s:"energy",   tag:"tag-util",    price:6.30,  lo:4.80, hi:8.20, div:"6.0%",  cap:"$4.8B",analyst:"Buy",        stb:"B-" },
-  { t:"EQNR", n:"Equinor ASA (Norway Energy)",     s:"energy",   tag:"tag-energy",  price:27.50, lo:22.00,hi:33.00,div:"5.8%",  cap:"$87B", analyst:"Buy",        stb:"B"  },
-  { t:"EUR",  n:"European Equity ETF / Specul.",   s:"specul",   tag:"tag-specul",  price:0.52,  lo:0.20, hi:1.80, div:"—",     cap:"N/A",  analyst:"N/R",        stb:"N/R"},
-  { t:"F",    n:"Ford Motor Company",              s:"finance",  tag:"tag-finance", price:9.80,  lo:8.40, hi:14.80,div:"5.6%",  cap:"$39B", analyst:"Hold",       stb:"C"  },
-  { t:"GGB",  n:"Gerdau SA — Brazil Steel ADR",    s:"finance",  tag:"tag-finance", price:4.10,  lo:3.00, hi:5.80, div:"5.5%",  cap:"$7.2B",analyst:"Buy",        stb:"C+" },
-  { t:"HL",   n:"Hecla Mining — Silver/Gold",      s:"silver",   tag:"tag-silver",  price:8.00,  lo:5.50, hi:11.20,div:"0.6%",  cap:"$4.6B",analyst:"Buy",        stb:"B"  },
-  { t:"IAG",  n:"IAMGOLD Corporation",             s:"gold",     tag:"tag-gold",    price:8.50,  lo:4.80, hi:11.00,div:"0.0%",  cap:"$4.2B",analyst:"Buy",        stb:"B+" },
-  { t:"ITUB", n:"Itaú Unibanco — Brazil Bank",     s:"finance",  tag:"tag-finance", price:8.40,  lo:6.20, hi:10.50,div:"4.8%",  cap:"$83B", analyst:"Buy",        stb:"B"  },
-  { t:"KGC",  n:"Kinross Gold Corporation",        s:"gold",     tag:"tag-gold",    price:13.00, lo:7.50, hi:14.50,div:"1.4%",  cap:"$16B", analyst:"Buy",        stb:"A-" },
-  { t:"LAC",  n:"Lithium Americas Corp",           s:"lithium",  tag:"tag-lithium", price:3.40,  lo:2.10, hi:8.20, div:"—",     cap:"$680M",analyst:"Buy",        stb:"C"  },
-  { t:"NGD",  n:"New Gold Inc",                    s:"gold",     tag:"tag-gold",    price:3.20,  lo:1.80, hi:4.10, div:"0.0%",  cap:"$2.1B",analyst:"Buy",        stb:"B-" },
-  { t:"NMG",  n:"Nouveau Monde Graphite",          s:"lithium",  tag:"tag-copper",  price:1.60,  lo:0.80, hi:4.20, div:"—",     cap:"$230M",analyst:"Buy",        stb:"C-" },
-  { t:"RZLV", n:"Rize ETF / Speculative",          s:"specul",   tag:"tag-specul",  price:0.35,  lo:0.10, hi:1.20, div:"—",     cap:"N/A",  analyst:"N/R",        stb:"N/R"},
-  { t:"SAN",  n:"Banco Santander — Spain ADR",     s:"finance",  tag:"tag-finance", price:6.20,  lo:4.20, hi:7.80, div:"5.2%",  cap:"$60B", analyst:"Buy",        stb:"B-" },
-  { t:"SAND", n:"Sandstorm Gold Royalties",        s:"gold",     tag:"tag-gold",    price:5.20,  lo:3.80, hi:7.20, div:"0.8%",  cap:"$1.2B",analyst:"Buy",        stb:"B"  },
-  { t:"UGP",  n:"Ultrapar Holdings — Brazil",      s:"energy",   tag:"tag-util",    price:3.80,  lo:2.90, hi:5.20, div:"4.0%",  cap:"$4.8B",analyst:"Hold",       stb:"C+" },
-  { t:"WRN",  n:"Western Copper and Gold",         s:"gold",     tag:"tag-copper",  price:2.80,  lo:1.60, hi:4.50, div:"—",     cap:"$450M",analyst:"Buy",        stb:"C"  },
-  { t:"WRND", n:"WR Nickel / Speculative",         s:"specul",   tag:"tag-specul",  price:0.22,  lo:0.05, hi:0.80, div:"—",     cap:"<$50M",analyst:"N/R",        stb:"N/R"},
+  { t:"ABEV", n:"Ambev SA ADR",                   s:"finance",  tag:"tag-brewery", price:2.38,  lo:1.73, hi:2.58, div:"13.0%", cap:"$36B", analyst:"Hold", stb:"C+" },
+  { t:"AG",   n:"First Majestic Silver",           s:"silver",   tag:"tag-silver",  price:10.80, lo:5.19, hi:32.04, div:"0.4%", cap:"$2.1B", analyst:"Buy", stb:"B" },
+  { t:"ASTI", n:"Ascendant Digital Acquisition",   s:"specul",    tag:"tag-specul",  price:0.18,  lo:0.08, hi:1.10, div:"—", cap:"<$50M", analyst:"N/R", stb:"N/R" },
+  { t:"ATAI", n:"ATAI Life Sciences",              s:"specul",    tag:"tag-specul",  price:1.20,  lo:0.80, hi:3.50, div:"—", cap:"~$200M", analyst:"N/R", stb:"N/R" },
+  { t:"BBD",  n:"Banco Bradesco ADR",              s:"finance",   tag:"tag-finance", price:2.50,  lo:1.90, hi:3.20, div:"7.2%", cap:"$25B", analyst:"Buy", stb:"C+" },
+  { t:"BTG",  n:"B2Gold Corp",                     s:"gold",      tag:"tag-gold",    price:4.80,  lo:3.10, hi:6.90, div:"5.0%", cap:"$4.8B", analyst:"Buy", stb:"B" },
+  { t:"CDE",  n:"Coeur Mining",                    s:"silver",    tag:"tag-silver",  price:7.60,  lo:4.20, hi:11.80, div:"0.0%", cap:"$2.8B", analyst:"Buy", stb:"B-" },
+  { t:"CIG",  n:"CEMIG — Brazil Utility ADR",      s:"energy",    tag:"tag-util",    price:2.20,  lo:1.60, hi:3.00, div:"8.5%", cap:"$5.5B", analyst:"Hold", stb:"C" },
+  { t:"ELP",  n:"Copel — Brazil Energy ADR",       s:"energy",    tag:"tag-util",    price:6.30,  lo:4.80, hi:8.20, div:"6.0%", cap:"$4.8B", analyst:"Buy", stb:"B-" },
+  { t:"EQNR", n:"Equinor ASA (Norway Energy)",     s:"energy",    tag:"tag-energy",  price:27.50, lo:22.00, hi:33.00, div:"5.8%", cap:"$87B", analyst:"Buy", stb:"B" },
+  { t:"EUR",  n:"European Equity ETF / Specul.",   s:"specul",    tag:"tag-specul",  price:0.52,  lo:0.20, hi:1.80, div:"—", cap:"N/A", analyst:"N/R", stb:"N/R" },
+  { t:"F",    n:"Ford Motor Company",              s:"finance",   tag:"tag-finance", price:9.80,  lo:8.40, hi:14.80, div:"5.6%", cap:"$39B", analyst:"Hold", stb:"C" },
+  { t:"GGB",  n:"Gerdau SA — Brazil Steel ADR",    s:"finance",   tag:"tag-finance", price:4.10,  lo:3.00, hi:5.80, div:"5.5%", cap:"$7.2B", analyst:"Buy", stb:"C+" },
+  { t:"HL",   n:"Hecla Mining — Silver/Gold",      s:"silver",    tag:"tag-silver",  price:8.00,  lo:5.50, hi:11.20, div:"0.6%", cap:"$4.6B", analyst:"Buy", stb:"B" },
+  { t:"IAG",  n:"IAMGOLD Corporation",             s:"gold",      tag:"tag-gold",    price:8.50,  lo:4.80, hi:11.00, div:"0.0%", cap:"$4.2B", analyst:"Buy", stb:"B+" },
+  { t:"ITUB", n:"Itaú Unibanco — Brazil Bank",     s:"finance",   tag:"tag-finance", price:8.40,  lo:6.20, hi:10.50, div:"4.8%", cap:"$83B", analyst:"Buy", stb:"B" },
+  { t:"KGC",  n:"Kinross Gold Corporation",        s:"gold",      tag:"tag-gold",    price:13.00, lo:7.50, hi:14.50, div:"1.4%", cap:"$16B", analyst:"Buy", stb:"A-" },
+  { t:"LAC",  n:"Lithium Americas Corp",           s:"lithium",   tag:"tag-lithium", price:3.40,  lo:2.10, hi:8.20, div:"—", cap:"$680M", analyst:"Buy", stb:"C" },
+  { t:"NGD",  n:"New Gold Inc",                    s:"gold",      tag:"tag-gold",    price:3.20,  lo:1.80, hi:4.10, div:"0.0%", cap:"$2.1B", analyst:"Buy", stb:"B-" },
+  { t:"NMG",  n:"Nouveau Monde Graphite",          s:"lithium",   tag:"tag-copper",  price:1.60,  lo:0.80, hi:4.20, div:"—", cap:"$230M", analyst:"Buy", stb:"C-" },
+  { t:"RZLV", n:"Rize ETF / Speculative",          s:"specul",    tag:"tag-specul",  price:0.35,  lo:0.10, hi:1.20, div:"—", cap:"N/A", analyst:"N/R", stb:"N/R" },
+  { t:"SAN",  n:"Banco Santander — Spain ADR",     s:"finance",   tag:"tag-finance", price:6.20,  lo:4.20, hi:7.80, div:"5.2%", cap:"$60B", analyst:"Buy", stb:"B-" },
+  { t:"SAND", n:"Sandstorm Gold Royalties",        s:"gold",      tag:"tag-gold",    price:5.20,  lo:3.80, hi:7.20, div:"0.8%", cap:"$1.2B", analyst:"Buy", stb:"B" },
+  { t:"UGP",  n:"Ultrapar Holdings — Brazil",      s:"energy",    tag:"tag-util",    price:3.80,  lo:2.90, hi:5.20, div:"4.0%", cap:"$4.8B", analyst:"Hold", stb:"C+" },
+  { t:"WRN",  n:"Western Copper and Gold",         s:"gold",      tag:"tag-copper",  price:2.80,  lo:1.60, hi:4.50, div:"—", cap:"$450M", analyst:"Buy", stb:"C" },
+  { t:"WRND", n:"WR Nickel / Speculative",         s:"specul",    tag:"tag-specul",  price:0.22,  lo:0.05, hi:0.80, div:"—", cap:"<$50M", analyst:"N/R", stb:"N/R" }
 ];
 
 let activeFilter = 'all';
@@ -564,9 +551,15 @@ function gradeClass(g) {
 function yieldColor(d) {
   if (!d || d === '—') return 'color:var(--muted)';
   const v = parseFloat(d);
-  if (v >= 8)  return 'color:var(--green)';
-  if (v >= 4)  return 'color:var(--amber)';
+  if (v >= 8) return 'color:var(--green)';
+  if (v >= 4) return 'color:var(--amber)';
   return 'color:var(--text)';
+}
+
+function fmtPrice(v) {
+  if (v >= 100) return v.toFixed(2);
+  if (v >= 1) return v.toFixed(2);
+  return v.toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
 }
 
 function renderGrid(data) {
@@ -584,7 +577,7 @@ function renderGrid(data) {
     row.innerHTML = `
       <div class="cell-ticker">${d.t}</div>
       <div class="cell-name">${d.n} <span class="sector-tag ${d.tag}">${d.s}</span></div>
-      <div class="cell-price">$${d.price.toFixed(2)}</div>
+      <div class="cell-price" id="price-${d.t}">$${fmtPrice(d.price)}</div>
       <div class="cell-52wk">$${d.lo}–$${d.hi}</div>
       <div class="cell-yield" style="${yieldColor(d.div)}">${d.div}</div>
       <div class="cell-mktcap">${d.cap}</div>
@@ -630,19 +623,17 @@ function openAllFinviz() {
   });
 }
 
-// ─── CLOCK + MARKET STATUS ───────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-US', { hour12: true, hour:'2-digit', minute:'2-digit', second:'2-digit' });
   document.getElementById('clock').textContent = timeStr;
 
-  // NYSE hours: Mon–Fri 9:30–16:00 ET
   const et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const day = et.getDay();
   const h = et.getHours(), m = et.getMinutes();
   const mins = h * 60 + m;
   const isWeekday = day >= 1 && day <= 5;
-  const isOpen = isWeekday && mins >= 570 && mins < 960; // 9:30 to 16:00
+  const isOpen = isWeekday && mins >= 570 && mins < 960;
 
   const el = document.getElementById('market-status');
   if (isOpen) {
@@ -664,11 +655,31 @@ function updateClock() {
   document.getElementById('st-date').textContent = now.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
 }
 
+async function fetchLivePrice(symbol) {
+  const url = `https://api.twelvedata.com/price?symbol=${encodeURIComponent(symbol)}&apikey=${TWELVEDATA_API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data && data.price) return parseFloat(data.price);
+  throw new Error(data?.message || `No price returned for ${symbol}`);
+}
+
+async function loadLivePrices() {
+  const targets = tickers.filter(x => x.t !== 'EUR' && x.t !== 'RZLV' && x.t !== 'ASTI' && x.t !== 'ATAI' && x.t !== 'WRND');
+  await Promise.allSettled(targets.map(async d => {
+    try {
+      const p = await fetchLivePrice(d.t);
+      if (!Number.isNaN(p)) d.price = p;
+    } catch (e) {
+      console.warn(d.t, e.message);
+    }
+  }));
+  filterRows();
+}
+
 setInterval(updateClock, 1000);
 updateClock();
-
-// ─── INIT ────────────────────────────────────────────────────────────────
 renderGrid(tickers);
+loadLivePrices();
 </script>
 </body>
 </html>
