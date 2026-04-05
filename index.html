@@ -588,30 +588,45 @@ function renderGrid(data) {
     grid.appendChild(row);
   });
   document.getElementById('st-count').textContent = data.length;
+<script>
 function filterRows() {
   const q = document.getElementById('search').value.toLowerCase().trim();
   let data = tickers;
   if (activeFilter !== 'all') data = data.filter(d => d.s === activeFilter);
-  if (q) data = data.filter(d => d.t.toLowerCase().includes(q) || d.n.toLowerCase().includes(q));
+  if (q) {
+    data = data.filter(d =>
+      d.t.toLowerCase().includes(q) ||
+      d.n.toLowerCase().includes(q)
+    );
+  }
   renderGrid(data);
 }
+
 function setFilter(sector, btn) {
   activeFilter = sector;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   filterRows();
 }
+
 function openAllYahoo() {
   tickers.forEach((d, i) => {
-    setTimeout(() => window.open(`https://finance.yahoo.com/quote/${d.t}`, '_blank', 'noopener'), i * 120);
+    setTimeout(
+      () => window.open(`https://finance.yahoo.com/quote/${d.t}`, '_blank', 'noopener'),
+      i * 120
+    );
   });
 }
+
 function openAllFinviz() {
   tickers.forEach((d, i) => {
-    setTimeout(() => window.open(`https://finviz.com/quote.ashx?t=${d.t}`, '_blank', 'noopener'), i * 120);
+    setTimeout(
+      () => window.open(`https://finviz.com/quote.ashx?t=${d.t}`, '_blank', 'noopener'),
+      i * 120
+    );
   });
 }
-<script>
+
 async function fetchLivePrice(symbol) {
   const url = `https://api.twelvedata.com/price?symbol=${encodeURIComponent(symbol)}&apikey=${TWELVEDATA_API_KEY}`;
   const res = await fetch(url);
@@ -619,9 +634,36 @@ async function fetchLivePrice(symbol) {
   if (data && data.price) return parseFloat(data.price);
   throw new Error(data?.message || `No price returned for ${symbol}`);
 }
+
 async function loadLivePrices() {
-  const targets = tickers.filter(x => x.t !== 'EUR' && x.t !== 'RZLV' && x.t !== 'ASTI' && x.t !== 'ATAI' && x.t !== 'WRND');
-  await Promise.allSettled(targets.map(async d => {
-    try {
-      const p = await fetchLivePrice(d.t);
-      if (!Number.isNaN(p)) d.price = p;
+  const targets = tickers.filter(x =>
+    x.t !== 'EUR' &&
+    x.t !== 'RZLV' &&
+    x.t !== 'ASTI' &&
+    x.t !== 'ATAI' &&
+    x.t !== 'WRND'
+  );
+
+  await Promise.allSettled(
+    targets.map(async d => {
+      try {
+        const p = await fetchLivePrice(d.t);
+        if (!Number.isNaN(p)) d.price = p;
+      } catch (e) {
+        console.warn(d.t, e.message);
+      }
+    })
+  );
+
+  filterRows();
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+renderGrid(tickers);
+loadLivePrices();
+</script>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
