@@ -588,71 +588,28 @@ function renderGrid(data) {
     grid.appendChild(row);
   });
   document.getElementById('st-count').textContent = data.length;
-}
-
-function filterRows() {
+}function filterRows() {
   const q = document.getElementById('search').value.toLowerCase().trim();
   let data = tickers;
   if (activeFilter !== 'all') data = data.filter(d => d.s === activeFilter);
   if (q) data = data.filter(d => d.t.toLowerCase().includes(q) || d.n.toLowerCase().includes(q));
   renderGrid(data);
-}
-
 function setFilter(sector, btn) {
   activeFilter = sector;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   filterRows();
 }
-
-function openAll() {
-  tickers.forEach((d, i) => {
-    setTimeout(() => window.open(`https://swingtradebot.com/equities/${d.t}`, '_blank', 'noopener'), i * 120);
-  });
-}
-
-function openAllYahoo() {
+function openAllYahoo() {}
   tickers.forEach((d, i) => {
     setTimeout(() => window.open(`https://finance.yahoo.com/quote/${d.t}`, '_blank', 'noopener'), i * 120);
   });
 }
-
 function openAllFinviz() {
   tickers.forEach((d, i) => {
     setTimeout(() => window.open(`https://finviz.com/quote.ashx?t=${d.t}`, '_blank', 'noopener'), i * 120);
   });
 }
-
-function updateClock() {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-US', { hour12: true, hour:'2-digit', minute:'2-digit', second:'2-digit' });
-  document.getElementById('clock').textContent = timeStr;
-
-  const et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  const day = et.getDay();
-  const h = et.getHours(), m = et.getMinutes();
-  const mins = h * 60 + m;
-  const isWeekday = day >= 1 && day <= 5;
-  const isOpen = isWeekday && mins >= 570 && mins < 960;
-
-  const el = document.getElementById('market-status');
-  if (isOpen) {
-    el.textContent = '● NYSE OPEN';
-    el.className = 'market-status status-open';
-  } else if (isWeekday && mins >= 540 && mins < 570) {
-    el.textContent = '◉ PRE-MARKET';
-    el.className = 'market-status status-open';
-    el.style.color = 'var(--amber)';
-  } else if (isWeekday && mins >= 960 && mins < 1200) {
-    el.textContent = '◎ AFTER-HOURS';
-    el.className = 'market-status status-open';
-    el.style.color = 'var(--amber)';
-  } else {
-    el.textContent = '○ MARKET CLOSED';
-    el.className = 'market-status status-closed';
-  }
-
-  document.getElementById('st-date').textContent = now.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
 <script>
 async function fetchLivePrice(symbol) {
   const url = `https://api.twelvedata.com/price?symbol=${encodeURIComponent(symbol)}&apikey=${TWELVEDATA_API_KEY}`;
@@ -660,7 +617,7 @@ async function fetchLivePrice(symbol) {
   const data = await res.json();
   if (data && data.price) return parseFloat(data.price);
   throw new Error(data?.message || `No price returned for ${symbol}`);
-}
+}   <!-- ⭐ THIS BRACE WAS MISSING -->
 
 async function loadLivePrices() {
   const targets = tickers.filter(x => x.t !== 'EUR' && x.t !== 'RZLV' && x.t !== 'ASTI' && x.t !== 'ATAI' && x.t !== 'WRND');
@@ -680,6 +637,7 @@ updateClock();
 renderGrid(tickers);
 loadLivePrices();
 </script>
+
 <script src="dashboard.js"></script>
 </body>
 </html>
